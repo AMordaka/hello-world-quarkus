@@ -1,48 +1,29 @@
 package pl.dmcs
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Singleton
 
 interface PersonRepository {
-    fun update(id: Int, person: Person): Person
-    fun insert(person: Person): Person
-    fun findById(id: Int): Person?
-    fun delete(id: Int): Boolean
-    fun fill(data: List<Person>)
+    fun delete(): Boolean
+    fun fill(data: List<Person>): List<Person>
     fun getAll(): List<Person>
 }
 
 
 @Singleton
-private class InMemoryPersonRepository : PersonRepository {
+class InMemoryPersonRepository : PersonRepository {
 
     private val store: MutableMap<Int, Person> = ConcurrentHashMap()
 
-    override fun update(id: Int, person: Person): Person {
-        store[id] = person
-        return store[id]!!
-    }
-
-    override fun insert(person: Person): Person {
-        val size = store.size
-        store[size] = person
-        return store[size]!!
-    }
-
-    override fun findById(id: Int): Person? {
-        return store[id]
-    }
-
-    override fun delete(id: Int): Boolean {
-        if (findById(id) == null) {
-            return false
-        }
-        store.remove(id)
+    override fun delete(): Boolean {
+        store.forEach { store.remove(it.key) }
         return true
     }
 
-    override fun fill(data: List<Person>) {
+    override fun fill(data: List<Person>): List<Person> {
         data.forEachIndexed { index, person -> store[index] = person }
+        return data
     }
 
     override fun getAll(): List<Person> {
@@ -54,17 +35,66 @@ private class InMemoryPersonRepository : PersonRepository {
 
 }
 
+@JsonIgnoreProperties
 data class Person(
-        val firstName: String = "",
-        val surname: String = "",
-        val gender: String = "",
-        val company: String = "",
-        val email: String = "",
-        val phone: String = "",
-        val age: Int = 0,
-        val country: String = "",
-        val state: String = "",
-        val city: String = ""
+        var firstName: String = "",
+        var surname: String = "",
+        var gender: String = "",
+        var company: String = "",
+        var email: String = "",
+        var phone: String = "",
+        var age: Int = 0,
+        val address: Address = Address("Poland", "lodzkie", "Lodz"),
+        val cars: List<Car> = listOf(
+                Car("My audi", "123", CarType("Audi", "A1")),
+                Car("BMW", "1234", CarType("BMW", "X1")),
+                Car("Citroen", "12345", CarType("Citroen", "C3")),
+                Car("Dacia", "123456", CarType("Dacia", "A1")),
+                Car("My audi", "123", CarType("Audi", "A1")),
+                Car("BMW", "1234", CarType("BMW", "X1")),
+                Car("Citroen", "12345", CarType("Citroen", "C3")),
+                Car("Dacia", "123456", CarType("Dacia", "A1")),
+                Car("My audi", "123", CarType("Audi", "A1")),
+                Car("BMW", "1234", CarType("BMW", "X1")),
+                Car("Citroen", "12345", CarType("Citroen", "C3")),
+                Car("Dacia", "123456", CarType("Dacia", "A1"))
+        ),
+        val test: Map<Int, Test> = mapOf(
+                1 to Test(1, "test"),
+                2 to Test(1, "test"),
+                3 to Test(1, "test"),
+                4 to Test(1, "test"),
+                5 to Test(1, "test"),
+                6 to Test(1, "test"),
+                7 to Test(1, "test"),
+                8 to Test(1, "test"),
+                9 to Test(1, "test"),
+                10 to Test(1, "test"),
+                11 to Test(1, "test"),
+                12 to Test(1, "test")
+        )
+)
+@JsonIgnoreProperties
+data class Address(
+        val country: String,
+        val state: String,
+        val city: String
 )
 
+@JsonIgnoreProperties
+data class Car(
+        val name: String,
+        val regNo: String,
+        val type: CarType
+)
+@JsonIgnoreProperties
+data class CarType(
+        val mark: String,
+        var model: String
+)
 
+@JsonIgnoreProperties
+data class Test(
+        val sum: Int,
+        val name: String
+)

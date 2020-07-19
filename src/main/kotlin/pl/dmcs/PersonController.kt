@@ -8,8 +8,6 @@ import javax.ws.rs.core.Response
 
 
 const val PATH_SLASH = "/"
-const val PATH_ID = "{id}"
-const val PATH_INIT = "init"
 
 @RegisterForReflection
 @Path(PATH_SLASH)
@@ -21,36 +19,26 @@ class PersonController {
     private lateinit var service: PersonService
 
     @POST
-    @Path(PATH_INIT)
-    fun initData(data: List<Person>) {
+    @Path(PATH_SLASH)
+    fun initData(data: List<Person>): Response {
         return service.fillData(data)
     }
 
     @GET
-    @Path(PATH_ID)
-    fun getSinglePersonMethod(@PathParam("id") id: Int): Response {
-        return service.findById(id)
-    }
-
-    @GET
+    @Path(PATH_SLASH)
     fun getPersonsMethod(): Response {
         return service.getAll()
     }
 
-    @POST
-    fun postMethod(person: Person): Response {
-        return service.insert(person)
-    }
-
     @PUT
-    @Path(PATH_ID)
-    fun putMethod(@PathParam("id") id: Int, person: Person): Response {
-        return service.update(id, person)
+    @Path(PATH_SLASH)
+    fun putMethod(data: List<Person>): Response {
+        return service.fillData(data)
     }
 
     @DELETE
-    @Path(PATH_ID)
-    fun deleteMethod(@PathParam("id") id: Int): Response {
-        return service.delete(id)
+    @Path(PATH_SLASH)
+    fun deleteMethod(): Response {
+        return service.delete()
     }
 }
